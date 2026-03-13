@@ -1,0 +1,35 @@
+packages:
+  "three": "Required for 3D battle arena visualization"
+  "@types/three": "Types for three.js"
+  "@react-three/fiber": "React renderer for Three.js used for the 3D battle scene"
+  "@react-three/drei": "Useful helpers and abstractions for React Three Fiber"
+  "wagmi": "React hooks for Ethereum, required for Base Mainnet interaction"
+  "viem": "TypeScript interface for Ethereum, required by wagmi"
+  "@rainbow-me/rainbowkit": "Wallet connection UI"
+  "@telegram-apps/sdk": "Telegram Mini App SDK for integration"
+  "framer-motion": "Animations for UI elements and page transitions"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility function to efficiently merge Tailwind CSS classes"
+
+images:
+  - path: "artifacts/arena-battle/public/images/logo.png"
+    description: "Cyberpunk neon skull helmet logo with glowing cyan and magenta accents on transparent background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/arena-battle/public/images/hero-bg.png"
+    description: "Dark cyberpunk underground fighting arena with glowing neon grid lines, dark purple and cyan atmospheric fog"
+    aspect_ratio: "16:9"
+  - path: "artifacts/arena-battle/public/images/warrior.png"
+    description: "Cyberpunk heavily armored warrior character portrait, glowing neon orange accents, dark background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/arena-battle/public/images/mage.png"
+    description: "Cyberpunk hacker/mage character portrait, holding glowing data holograms, electric blue accents, dark background"
+    aspect_ratio: "1:1"
+  - path: "artifacts/arena-battle/public/images/rogue.png"
+    description: "Cyberpunk stealth assassin character portrait, glowing magenta visor, sleek dark stealth suit, dark background"
+    aspect_ratio: "1:1"
+
+notes:
+  - Expecting standard ERC20, ERC721, and custom Battle contract ABIs to be used inline or mocked.
+  - Wagmi is configured for Base Mainnet.
+  - RainbowKit styles will need to be imported in the main App file.
+  - Using @workspace/api-client-react for generated API hooks.

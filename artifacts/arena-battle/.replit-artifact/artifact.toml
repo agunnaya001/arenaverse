@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Arena Battle - 3D Blockchain Battle Game"
+version = "1.0.0"
+id = "artifacts/arena-battle"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 24413
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/arena-battle run dev"
+
+[services.env]
+PORT = "24413"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/arena-battle", "run", "build"]
+publicDir = "artifacts/arena-battle/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"

@@ -1,15 +1,20 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Arena Battle API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: leaderboard
+    description: Leaderboard operations
+  - name: fighters
+    description: Fighter NFT operations
+  - name: battles
+    description: Battle operations
 paths:
   /healthz:
     get:
@@ -24,6 +29,118 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      summary: Get leaderboard
+      description: Returns top players ranked by wins
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  /leaderboard/player/{address}:
+    get:
+      operationId: getPlayerStats
+      tags: [leaderboard]
+      summary: Get player stats
+      parameters:
+        - name: address
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Player stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerStats"
+        "404":
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /battles:
+    get:
+      operationId: getBattleHistory
+      tags: [battles]
+      summary: Get recent battle history
+      parameters:
+        - name: address
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Battle history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BattleRecord"
+
+    post:
+      operationId: recordBattle
+      tags: [battles]
+      summary: Record a battle result
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecordBattleRequest"
+      responses:
+        "201":
+          description: Battle recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BattleRecord"
+
+  /fighters/{address}:
+    get:
+      operationId: getPlayerFighters
+      tags: [fighters]
+      summary: Get fighters for a player address
+      parameters:
+        - name: address
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Player fighters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Fighter"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +151,162 @@ components:
       required:
         - status
 
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        address:
+          type: string
+        wins:
+          type: integer
+        losses:
+          type: integer
+        totalBattles:
+          type: integer
+        winRate:
+          type: number
+        tokensEarned:
+          type: string
+      required:
+        - rank
+        - address
+        - wins
+        - losses
+        - totalBattles
+        - winRate
+        - tokensEarned
+
+    PlayerStats:
+      type: object
+      properties:
+        address:
+          type: string
+        wins:
+          type: integer
+        losses:
+          type: integer
+        totalBattles:
+          type: integer
+        winRate:
+          type: number
+        tokensEarned:
+          type: string
+        rank:
+          type: integer
+      required:
+        - address
+        - wins
+        - losses
+        - totalBattles
+        - winRate
+        - tokensEarned
+        - rank
+
+    BattleRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        txHash:
+          type: string
+        playerAddress:
+          type: string
+        opponentAddress:
+          type: string
+        winner:
+          type: string
+        playerFighterId:
+          type: integer
+        opponentFighterId:
+          type: integer
+        tokensStaked:
+          type: string
+        tokensRewarded:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - id
+        - txHash
+        - playerAddress
+        - opponentAddress
+        - winner
+        - playerFighterId
+        - opponentFighterId
+        - tokensStaked
+        - tokensRewarded
+        - timestamp
+
+    RecordBattleRequest:
+      type: object
+      properties:
+        txHash:
+          type: string
+        playerAddress:
+          type: string
+        opponentAddress:
+          type: string
+        winner:
+          type: string
+        playerFighterId:
+          type: integer
+        opponentFighterId:
+          type: integer
+        tokensStaked:
+          type: string
+        tokensRewarded:
+          type: string
+      required:
+        - txHash
+        - playerAddress
+        - opponentAddress
+        - winner
+        - playerFighterId
+        - opponentFighterId
+        - tokensStaked
+        - tokensRewarded
+
+    Fighter:
+      type: object
+      properties:
+        tokenId:
+          type: integer
+        name:
+          type: string
+        class:
+          type: string
+        attack:
+          type: integer
+        defense:
+          type: integer
+        speed:
+          type: integer
+        level:
+          type: integer
+        wins:
+          type: integer
+        losses:
+          type: integer
+        imageUri:
+          type: string
+      required:
+        - tokenId
+        - name
+        - class
+        - attack
+        - defense
+        - speed
+        - level
+        - wins
+        - losses
+        - imageUri
