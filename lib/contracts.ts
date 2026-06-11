@@ -1,397 +1,180 @@
+'use client';
+
+import { ethers } from 'ethers';
+
 // Contract addresses on Base
 export const CONTRACTS = {
-  ArenaMarketplace: '0x67817157Dd6E5945ac2fAf1a822e7f1dE26C698E',
-  ArenaToken: '0x3b855F88CB93aA642EaEB13F59987C552Fc614b5',
-  ArenaChampion: '0x68f08b005b09B0F7D07E1c0B5CDe18E43CE2486A',
-  ArenaBattle: '0xF6fc2B6a306B626548ca9dF25B31a22D0f8971CF',
-  ArenaPVP: '0xd0C4Af12E95f9590e7314D079C58597771E57533',
+  MARKETPLACE: '0x67817157Dd6E5945ac2fAf1a822e7f1dE26C698E',
+  ARENA_TOKEN: '0x3b855F88CB93aA642EaEB13F59987C552Fc614b5',
+  ARENA_CHAMPION: '0x68f08b005b09B0F7D07E1c0B5CDe18E43CE2486A',
+  ARENA_BATTLE: '0xF6fc2B6a306B626548ca9dF25B31a22D0f8971CF',
+  ARENA_PVP: '0xd0C4Af12E95f9590e7314D079C58597771E57533',
 } as const;
 
 // Base network configuration
-export const BASE_CHAIN = {
-  id: 8453,
-  name: 'Base',
-  network: 'base',
-  nativeCurrency: {
-    decimals: 18,
-    name: 'Ether',
-    symbol: 'ETH',
-  },
-  rpcUrls: {
-    default: { http: ['https://mainnet.base.org'] },
-    public: { http: ['https://mainnet.base.org'] },
-  },
-  blockExplorers: {
-    default: { name: 'BaseScan', url: 'https://basescan.org' },
-  },
-} as const;
+export const BASE_CHAIN_ID = 8453;
+export const BASE_RPC = 'https://mainnet.base.org';
+
+// Admin addresses - set via environment variable
+export const ADMIN_ADDRESSES = (process.env.NEXT_PUBLIC_ADMIN_ADDRESSES || '').split(',').filter(Boolean).map(a => a.toLowerCase());
+
+// Rarity System
+export enum ChampionRarity {
+  COMMON = 0,
+  RARE = 1,
+  EPIC = 2,
+  LEGENDARY = 3,
+  MYTHIC = 4,
+}
+
+export const RARITY_NAMES: Record<ChampionRarity, string> = {
+  [ChampionRarity.COMMON]: 'Common',
+  [ChampionRarity.RARE]: 'Rare',
+  [ChampionRarity.EPIC]: 'Epic',
+  [ChampionRarity.LEGENDARY]: 'Legendary',
+  [ChampionRarity.MYTHIC]: 'Mythic',
+};
+
+export const RARITY_COLORS: Record<ChampionRarity, string> = {
+  [ChampionRarity.COMMON]: '#888888',
+  [ChampionRarity.RARE]: '#4169E1',
+  [ChampionRarity.EPIC]: '#9370DB',
+  [ChampionRarity.LEGENDARY]: '#FFD700',
+  [ChampionRarity.MYTHIC]: '#FF1493',
+};
+
+// Trait type for NFT Factory
+export interface TraitDefinition {
+  name: string;
+  description?: string;
+  values: TraitValue[];
+}
+
+export interface TraitValue {
+  name: string;
+  rarity: number;
+  colorHint?: string;
+}
+
+// NFT Collection for Factory
+export interface NFTCollection {
+  id: string;
+  name: string;
+  symbol: string;
+  description?: string;
+  creator: string;
+  contractAddress?: string;
+  traits: TraitDefinition[];
+  maxSupply: number;
+  royaltyPercentage: number;
+  baseUri?: string;
+  createdAt: number;
+  totalMinted: number;
+}
+
+// Generated NFT Metadata
+export interface GeneratedNFT {
+  tokenId?: string;
+  name: string;
+  description: string;
+  image: string;
+  attributes: Array<{ trait_type: string; value: string }>;
+  rarity: ChampionRarity;
+  rarityScore: number;
+}
+
+// Types for champions
+export interface Champion {
+  tokenId: bigint;
+  owner: string;
+  rarity: ChampionRarity;
+  power: number;
+  name: string;
+  class: string;
+  attributes: {
+    strength: number;
+    agility: number;
+    intelligence: number;
+    vitality: number;
+  };
+  imageUrl: string;
+  metadata?: Record<string, any>;
+}
+
+export interface MarketplaceListing {
+  id: bigint;
+  tokenId: bigint;
+  seller: string;
+  price: bigint;
+  active: boolean;
+  displayChampion?: Champion;
+}
+
+export interface PVPChallenge {
+  id: bigint;
+  challenger: string;
+  opponent?: string;
+  wager: bigint;
+  status: 'OPEN' | 'ACCEPTED' | 'COMPLETED';
+  winner?: string;
+  championId: bigint;
+  createdAt: number;
+}
 
 // ERC20 ABI (ArenaToken)
-export const ARENA_TOKEN_ABI = [
-  {
-    inputs: [{ name: 'account', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'spender', type: 'address' },
-      { name: 'amount', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'amount', type: 'uint256' },
-    ],
-    name: 'transfer',
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', type: 'uint8' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', type: 'string' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', type: 'string' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'owner', type: 'address' },
-      { name: 'spender', type: 'address' },
-    ],
-    name: 'allowance',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as const;
+export const ARENA_TOKEN_ABI = [] as const;
 
 // ERC721 ABI (ArenaChampion NFT)
 export const ARENA_CHAMPION_ABI = [
-  {
-    inputs: [{ name: 'owner', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    name: 'ownerOf',
-    outputs: [{ name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    name: 'tokenURI',
-    outputs: [{ name: '', type: 'string' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
-    ],
-    name: 'approve',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'from', type: 'address' },
-      { name: 'to', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
-    ],
-    name: 'transferFrom',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'owner', type: 'address' },
-      { name: 'index', type: 'uint256' },
-    ],
-    name: 'tokenOfOwnerByIndex',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    name: 'getChampionStats',
-    outputs: [
-      { name: 'strength', type: 'uint256' },
-      { name: 'agility', type: 'uint256' },
-      { name: 'intelligence', type: 'uint256' },
-      { name: 'vitality', type: 'uint256' },
-      { name: 'level', type: 'uint256' },
-      { name: 'experience', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'mintChampion',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    name: 'upgradeChampion',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
+  'function balanceOf(address owner) view returns (uint256)',
+  'function ownerOf(uint256 tokenId) view returns (address)',
+  'function tokenURI(uint256 tokenId) view returns (string)',
+  'function approve(address to, uint256 tokenId)',
+  'function transferFrom(address from, address to, uint256 tokenId)',
+  'function totalSupply() view returns (uint256)',
+  'function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)',
+  'function getChampionStats(uint256 tokenId) view returns (uint256 strength, uint256 agility, uint256 intelligence, uint256 vitality, uint256 level, uint256 experience)',
+  'function mintChampion() payable returns (uint256)',
+  'function upgradeChampion(uint256 tokenId) payable',
 ] as const;
 
 // Arena Battle ABI
 export const ARENA_BATTLE_ABI = [
-  {
-    inputs: [{ name: 'championId', type: 'uint256' }],
-    name: 'enterBattle',
-    outputs: [{ name: 'battleId', type: 'uint256' }],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'battleId', type: 'uint256' }],
-    name: 'getBattleResult',
-    outputs: [
-      { name: 'winner', type: 'address' },
-      { name: 'loser', type: 'address' },
-      { name: 'reward', type: 'uint256' },
-      { name: 'completed', type: 'bool' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getActiveBattles',
-    outputs: [{ name: '', type: 'uint256[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'player', type: 'address' }],
-    name: 'getPlayerStats',
-    outputs: [
-      { name: 'wins', type: 'uint256' },
-      { name: 'losses', type: 'uint256' },
-      { name: 'totalRewards', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
+  'function enterBattle(uint256 championId) payable returns (uint256 battleId)',
+  'function getBattleResult(uint256 battleId) view returns (address winner, address loser, uint256 reward, bool completed)',
+  'function getActiveBattles() view returns (uint256[])',
+  'function getPlayerStats(address player) view returns (uint256 wins, uint256 losses, uint256 totalRewards)',
 ] as const;
 
 // Arena PVP ABI
 export const ARENA_PVP_ABI = [
-  {
-    inputs: [
-      { name: 'championId', type: 'uint256' },
-      { name: 'wagerAmount', type: 'uint256' },
-    ],
-    name: 'createChallenge',
-    outputs: [{ name: 'challengeId', type: 'uint256' }],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { name: 'challengeId', type: 'uint256' },
-      { name: 'championId', type: 'uint256' },
-    ],
-    name: 'acceptChallenge',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'challengeId', type: 'uint256' }],
-    name: 'cancelChallenge',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getOpenChallenges',
-    outputs: [
-      {
-        components: [
-          { name: 'id', type: 'uint256' },
-          { name: 'challenger', type: 'address' },
-          { name: 'championId', type: 'uint256' },
-          { name: 'wagerAmount', type: 'uint256' },
-          { name: 'isActive', type: 'bool' },
-        ],
-        name: '',
-        type: 'tuple[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'player', type: 'address' }],
-    name: 'getPVPRecord',
-    outputs: [
-      { name: 'wins', type: 'uint256' },
-      { name: 'losses', type: 'uint256' },
-      { name: 'totalWagered', type: 'uint256' },
-      { name: 'totalWon', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
+  'function createChallenge(uint256 championId, uint256 wagerAmount) payable returns (uint256 challengeId)',
+  'function acceptChallenge(uint256 challengeId, uint256 championId) payable',
+  'function cancelChallenge(uint256 challengeId)',
+  'function getOpenChallenges() view returns (tuple(uint256 id, address challenger, uint256 championId, uint256 wagerAmount, bool isActive)[])',
+  'function getPVPRecord(address player) view returns (uint256 wins, uint256 losses, uint256 totalWagered, uint256 totalWon)',
 ] as const;
 
 // Arena Marketplace ABI
 export const ARENA_MARKETPLACE_ABI = [
-  {
-    inputs: [
-      { name: 'nftContract', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'price', type: 'uint256' },
-    ],
-    name: 'listItem',
-    outputs: [{ name: 'listingId', type: 'uint256' }],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'listingId', type: 'uint256' }],
-    name: 'buyItem',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'listingId', type: 'uint256' }],
-    name: 'cancelListing',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getActiveListings',
-    outputs: [
-      {
-        components: [
-          { name: 'id', type: 'uint256' },
-          { name: 'seller', type: 'address' },
-          { name: 'nftContract', type: 'address' },
-          { name: 'tokenId', type: 'uint256' },
-          { name: 'price', type: 'uint256' },
-          { name: 'isActive', type: 'bool' },
-        ],
-        name: '',
-        type: 'tuple[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'listingId', type: 'uint256' }],
-    name: 'getListing',
-    outputs: [
-      { name: 'seller', type: 'address' },
-      { name: 'nftContract', type: 'address' },
-      { name: 'tokenId', type: 'uint256' },
-      { name: 'price', type: 'uint256' },
-      { name: 'isActive', type: 'bool' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'amount', type: 'uint256' }],
-    name: 'stake',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'amount', type: 'uint256' }],
-    name: 'unstake',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'account', type: 'address' }],
-    name: 'getStakedAmount',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ name: 'account', type: 'address' }],
-    name: 'getPendingRewards',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'claimRewards',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
+  'function listItem(address nftContract, uint256 tokenId, uint256 price) returns (uint256 listingId)',
+  'function buyItem(uint256 listingId) payable',
+  'function cancelListing(uint256 listingId)',
+  'function getActiveListings() view returns (tuple(uint256 id, address seller, address nftContract, uint256 tokenId, uint256 price, bool isActive)[])',
+  'function getListing(uint256 listingId) view returns (address seller, address nftContract, uint256 tokenId, uint256 price, bool isActive)',
+  'function stake(uint256 amount)',
+  'function unstake(uint256 amount)',
+  'function getStakedAmount(address account) view returns (uint256)',
+  'function getPendingRewards(address account) view returns (uint256)',
+  'function claimRewards()',
 ] as const;
 
-// Helper to format addresses
+// Utility functions
 export function formatAddress(address: string): string {
+  if (!address) return '';
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-// Helper to format token amounts
 export function formatTokenAmount(amount: bigint, decimals: number = 18): string {
   const divisor = BigInt(10 ** decimals);
   const integerPart = amount / divisor;
@@ -400,9 +183,17 @@ export function formatTokenAmount(amount: bigint, decimals: number = 18): string
   return `${integerPart.toLocaleString()}.${fractionalStr}`;
 }
 
-// Helper to parse token amounts
 export function parseTokenAmount(amount: string, decimals: number = 18): bigint {
   const [integer, fraction = ''] = amount.split('.');
   const paddedFraction = fraction.padEnd(decimals, '0').slice(0, decimals);
   return BigInt(integer + paddedFraction);
+}
+
+export function calculatePowerRating(attributes: { strength: number; agility: number; intelligence: number; vitality: number }): number {
+  return (attributes.strength + attributes.agility + attributes.intelligence + attributes.vitality) / 4;
+}
+
+export function isAdmin(address?: string): boolean {
+  if (!address) return false;
+  return ADMIN_ADDRESSES.includes(address.toLowerCase());
 }
