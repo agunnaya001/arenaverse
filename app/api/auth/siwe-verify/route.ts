@@ -1,50 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { SIWEVerifySchema } from '@/lib/validation/schemas';
 import { registerSIWESession } from '@/lib/auth/siwe';
+import {
+  successResponse,
+  validationError,
+  unauthorizedError,
+  serverError,
+} from '@/lib/utils/api-response';
 
 /**
  * POST /api/auth/siwe-verify
  * Verify SIWE signature and create session
+ * Request: { message, signature, nonce }
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { address, message, signature, nonce, chainId } = body;
 
-    if (!address || !message || !signature || !nonce || !chainId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    // Validate request payload
+    const validatedData = SIWEVerifySchema.safeParse(body);
+    if (!validatedData.success) {
+      return validationError(validatedData.error.errors);
     }
 
+    const { message, signature, nonce } = validatedData.data;
+
+    // Verify and register session
     const result = await registerSIWESession(
-      address,
       message,
       signature,
-      nonce,
-      chainId
+      nonce
     );
 
-    if (!result) {
-      return NextResponse.json(
-        { error: 'Failed to verify signature' },
-        { status: 401 }
-      );
+    if (!result || !result.verified) {
+      return unauthorizedError('Invalid message or signature verification failed');
     }
 
-    return NextResponse.json(
+    return successResponse(
       {
-        success: true,
-        userId: result.userId,
-        token: result.token,
+        authenticated: true,
+        address: result.address,
+        sessionId: result.sessionId,
       },
-      { status: 200 }
+      200
     );
   } catch (error) {
-    console.error('[v0] SIWE verification failed:', error);
-    return NextResponse.json(
-      { error: 'Failed to verify SIWE signature' },
-      { status: 500 }
-    );
+    console.error('[API] SIWE verification error:', error);
+    return serverError('SIWE verification failed', error instanceof Error ? error : undefined);
   }
 }
