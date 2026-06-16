@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/client';
+import { generateBattleNFT, mintBattleRewardNFT } from '@/lib/nft/nft-generator';
 
 /**
  * POST /api/battle/result
@@ -102,6 +103,22 @@ export async function POST(request: NextRequest) {
       console.error('[v0] Failed to record reward:', rewardError);
     }
 
+    // Mint NFT reward for wins
+    let nftReward = null;
+    if (result === 'Win') {
+      const battleRewardNFT = generateBattleNFT({ difficulty: 3 });
+      const nftResult = await mintBattleRewardNFT(userId, battleId, battleRewardNFT);
+      
+      if (nftResult.success) {
+        nftReward = {
+          tokenId: nftResult.tokenId,
+          metadata: battleRewardNFT,
+        };
+      } else {
+        console.error('[v0] Failed to mint battle reward NFT:', nftResult.error);
+      }
+    }
+
     return NextResponse.json(
       {
         battleId,
@@ -110,6 +127,7 @@ export async function POST(request: NextRequest) {
         tokensEarned: tokenReward,
         newLevel,
         newXp,
+        nftReward,
       },
       { status: 200 }
     );
