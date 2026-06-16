@@ -24,8 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useWeb3 } from '@/lib/web3-context';
-import { BASE_CHAIN } from '@/lib/contracts';
+import { useWeb3, BASE_CHAIN } from '@/lib/web3-context';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -104,7 +103,7 @@ export function Header() {
                 {/* Balance Display */}
                 <div className="hidden md:flex items-center gap-3">
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/50 border border-border/50">
-                    <Coins className="w-4 h-4 text-arena-gold" />
+                    <Coins className="w-4 h-4 text-yellow-500" />
                     <span className="text-sm font-medium">{arenaBalance} ARENA</span>
                   </div>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/50 border border-border/50">
@@ -176,7 +175,7 @@ export function Header() {
               </>
             ) : (
               <Button 
-                onClick={connect} 
+                onClick={() => connect()} 
                 disabled={isConnecting}
                 className="gap-2 bg-primary hover:bg-primary/90"
               >
