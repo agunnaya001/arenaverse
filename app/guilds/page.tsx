@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Coins, UserPlus, Loader2, AlertCircle } from 'lucide-react';
+import { GuildCard } from '@/components/guild-card';
+import { Users, Coins, UserPlus, Loader2, AlertCircle, Crown, Search } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -214,49 +215,25 @@ export default function GuildsPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {guilds.map((guild) => (
-                  <Card key={guild.id} className="hover:border-primary/50 transition-colors">
-                    <CardHeader>
-                      <CardTitle>{guild.name}</CardTitle>
-                      <CardDescription>{guild.description || 'No description'}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Members</p>
-                          <p className="text-lg font-bold flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            {guild.member_count}
-                          </p>
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Treasury</p>
-                          <p className="text-lg font-bold flex items-center gap-1">
-                            <Coins className="w-4 h-4" />
-                            {guild.treasury_balance.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Level</p>
-                          <p className="text-lg font-bold">{guild.level}</p>
-                        </div>
-                      </div>
-
-                      <Badge variant="outline" className="w-full justify-center">
-                        Level {guild.level}
-                      </Badge>
-
-                      {isConnected ? (
-                        <Button onClick={() => joinGuild(guild.id)} className="w-full">
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Join Guild
-                        </Button>
-                      ) : (
-                        <Button onClick={connect} variant="outline" className="w-full">
-                          Connect to Join
-                        </Button>
-                      )}
-                    </CardContent>
-                  </Card>
+                  <GuildCard
+                    key={guild.id}
+                    id={guild.id}
+                    name={guild.name}
+                    description={guild.description}
+                    memberCount={guild.member_count}
+                    treasuryBalance={guild.treasury_balance}
+                    level={guild.level}
+                    onJoin={() => {
+                      if (isConnected) {
+                        joinGuild(guild.id);
+                      } else {
+                        connect();
+                      }
+                    }}
+                    onView={() => {
+                      toast.info('Guild details coming soon');
+                    }}
+                  />
                 ))}
               </div>
             )}

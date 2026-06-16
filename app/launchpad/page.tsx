@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DeploymentWizard } from '@/components/deployment-wizard';
 import { AlertCircle, Rocket, CheckCircle, Clock, XCircle, ExternalLink, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
@@ -220,18 +221,17 @@ export default function LaunchpadPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Deploy New Contract</CardTitle>
-                <CardDescription>Generate and deploy a smart contract</CardDescription>
+                <CardDescription>Step-by-step wizard to deploy your smart contract</CardDescription>
               </CardHeader>
               <CardContent>
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Use the AI Studio to generate a contract first, then deploy it here
-                  </AlertDescription>
-                </Alert>
-                <Button className="w-full mt-4" asChild>
-                  <a href="/ai-studio">Go to AI Studio</a>
-                </Button>
+                <DeploymentWizard
+                  title="ERC721 NFT Contract"
+                  description="Deploy your NFT collection to Base blockchain"
+                  onDeploy={() => {
+                    toast.success('Contract deployment submitted!');
+                    loadDeployments();
+                  }}
+                />
               </CardContent>
             </Card>
           </TabsContent>

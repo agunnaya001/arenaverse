@@ -9,7 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, Zap, Code, Wand2, Calculator, Image as ImageIcon, Loader2, CheckCircle } from 'lucide-react';
+import { ContractEditor } from '@/components/contract-editor';
+import { AlertCircle, Zap, Code, Wand2, Calculator, Image as ImageIcon, Loader2, CheckCircle, Sparkles } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 
@@ -224,29 +225,13 @@ export default function AIStudioPage() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Generated Code</CardTitle>
-                  <CardDescription>Your smart contract Solidity code</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {generatedCode ? (
-                    <div className="space-y-2">
-                      <div className="bg-muted p-4 rounded-lg font-mono text-sm max-h-96 overflow-y-auto">
-                        <pre>{generatedCode.substring(0, 500)}...</pre>
-                      </div>
-                      <Button variant="outline" className="w-full">
-                        <Zap className="w-4 h-4 mr-2" />
-                        Copy to Clipboard
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="h-96 flex items-center justify-center text-muted-foreground">
-                      Generated code will appear here
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <ContractEditor
+                code={generatedCode}
+                contractType={contractType}
+                contractName={contractName}
+                onCopy={() => toast.success('Code copied to clipboard')}
+                onDownload={() => toast.success('Contract downloaded')}
+              />
             </div>
           </TabsContent>
 

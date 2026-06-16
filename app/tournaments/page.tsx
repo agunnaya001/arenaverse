@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Users, Coins, Clock, Loader2, Swords } from 'lucide-react';
+import { TournamentCard } from '@/components/tournament-card';
+import { Trophy, Users, Coins, Clock, Loader2, Swords, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Tournament {
@@ -120,18 +121,28 @@ export default function TournamentsPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tournaments
                   .filter(t => t.status === 'Active')
                   .map((tournament) => (
                     <TournamentCard
                       key={tournament.id}
-                      tournament={tournament}
-                      isConnected={isConnected}
-                      onJoin={() => joinTournament(tournament.id)}
-                      onConnect={connect}
-                      onSelect={() => setSelectedTournament(tournament)}
-                      joining={joining}
+                      id={tournament.id}
+                      name={tournament.name}
+                      description={tournament.description}
+                      participantCount={tournament.current_participants}
+                      maxParticipants={tournament.max_participants || 64}
+                      prizePool={tournament.prize_pool || 0}
+                      status="active"
+                      startDate={tournament.start_date || new Date().toISOString()}
+                      onJoin={() => {
+                        if (isConnected) {
+                          joinTournament(tournament.id);
+                        } else {
+                          connect();
+                        }
+                      }}
+                      onView={() => setSelectedTournament(tournament)}
                     />
                   ))}
               </div>
@@ -154,18 +165,28 @@ export default function TournamentsPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tournaments
                   .filter(t => t.status === 'Upcoming')
                   .map((tournament) => (
                     <TournamentCard
                       key={tournament.id}
-                      tournament={tournament}
-                      isConnected={isConnected}
-                      onJoin={() => joinTournament(tournament.id)}
-                      onConnect={connect}
-                      onSelect={() => setSelectedTournament(tournament)}
-                      joining={joining}
+                      id={tournament.id}
+                      name={tournament.name}
+                      description={tournament.description}
+                      participantCount={tournament.current_participants}
+                      maxParticipants={tournament.max_participants || 64}
+                      prizePool={tournament.prize_pool || 0}
+                      status="upcoming"
+                      startDate={tournament.start_date || new Date().toISOString()}
+                      onJoin={() => {
+                        if (isConnected) {
+                          joinTournament(tournament.id);
+                        } else {
+                          connect();
+                        }
+                      }}
+                      onView={() => setSelectedTournament(tournament)}
                     />
                   ))}
               </div>
@@ -188,18 +209,28 @@ export default function TournamentsPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tournaments
                   .filter(t => t.status === 'Completed')
                   .map((tournament) => (
                     <TournamentCard
                       key={tournament.id}
-                      tournament={tournament}
-                      isConnected={isConnected}
-                      onJoin={() => joinTournament(tournament.id)}
-                      onConnect={connect}
-                      onSelect={() => setSelectedTournament(tournament)}
-                      joining={joining}
+                      id={tournament.id}
+                      name={tournament.name}
+                      description={tournament.description}
+                      participantCount={tournament.current_participants}
+                      maxParticipants={tournament.max_participants || 64}
+                      prizePool={tournament.prize_pool || 0}
+                      status="completed"
+                      startDate={tournament.start_date || new Date().toISOString()}
+                      onJoin={() => {
+                        if (isConnected) {
+                          joinTournament(tournament.id);
+                        } else {
+                          connect();
+                        }
+                      }}
+                      onView={() => setSelectedTournament(tournament)}
                     />
                   ))}
               </div>
