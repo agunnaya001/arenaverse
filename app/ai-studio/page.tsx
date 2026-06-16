@@ -59,11 +59,20 @@ export default function AIStudioPage() {
       return;
     }
 
+    // Validate contract name (alphanumeric only)
+    if (!/^[a-zA-Z0-9_]+$/.test(contractName)) {
+      toast.error('Contract name must contain only letters, numbers, and underscores');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch('/api/ai-studio/generate-contract', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': address || 'anonymous',
+        },
         body: JSON.stringify({
           type: contractType,
           name: contractName,
@@ -71,13 +80,18 @@ export default function AIStudioPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate contract');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate contract');
+      }
       const data = await response.json();
-      setGeneratedCode(data.code);
-      toast.success('Contract generated successfully!');
+      setGeneratedCode(data.code || data.rawCode);
+      toast.success('Contract generated successfully!', {
+        description: `${data.metrics?.lines || 0} lines of Solidity code`,
+      });
     } catch (error) {
       console.error('Generation error:', error);
-      toast.error('Failed to generate contract');
+      toast.error(error instanceof Error ? error.message : 'Failed to generate contract');
     } finally {
       setLoading(false);
     }

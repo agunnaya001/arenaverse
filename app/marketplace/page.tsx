@@ -24,41 +24,8 @@ interface MarketplaceChampion {
   sellerAddress: string;
 }
 
-const SAMPLE_LISTINGS: MarketplaceChampion[] = [
-  {
-    id: 'market-1',
-    name: 'Flame Warrior',
-    class: 'Warrior',
-    rarity: 'Legendary',
-    level: 25,
-    attack: 180,
-    defense: 150,
-    priceEth: 2.5,
-    sellerAddress: '0x1234...5678',
-  },
-  {
-    id: 'market-2',
-    name: 'Frost Mage',
-    class: 'Mage',
-    rarity: 'Epic',
-    level: 20,
-    attack: 200,
-    defense: 90,
-    priceEth: 1.2,
-    sellerAddress: '0x9876...5432',
-  },
-  {
-    id: 'market-3',
-    name: 'Shadow Archer',
-    class: 'Archer',
-    rarity: 'Rare',
-    level: 15,
-    attack: 160,
-    defense: 100,
-    priceEth: 0.5,
-    sellerAddress: '0xabcd...efgh',
-  },
-];
+// Initial empty - will be populated from database
+const INITIAL_LISTINGS: MarketplaceChampion[] = [];
 
 const RARITY_COLORS: Record<string, string> = {
   Common: 'bg-gray-500',
@@ -70,14 +37,49 @@ const RARITY_COLORS: Record<string, string> = {
 export default function MarketplacePage() {
   const { isConnected, connect } = useWeb3();
   const [mounted, setMounted] = useState(false);
-  const [listings, setListings] = useState<MarketplaceChampion[]>(SAMPLE_LISTINGS);
-  const [filteredListings, setFilteredListings] = useState<MarketplaceChampion[]>(SAMPLE_LISTINGS);
+  const [listings, setListings] = useState<MarketplaceChampion[]>([]);
+  const [filteredListings, setFilteredListings] = useState<MarketplaceChampion[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRarity, setSelectedRarity] = useState('All');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
+    loadMarketplaceListings();
   }, []);
+
+  const loadMarketplaceListings = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('champions')
+        .select('*')
+        .eq('is_listed', true)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      const formattedListings: MarketplaceChampion[] = (data || []).map((champion: any) => ({
+        id: champion.id,
+        name: champion.name,
+        class: champion.class,
+        rarity: champion.rarity,
+        level: champion.level || 1,
+        attack: champion.metadata?.stats?.attack || 100,
+        defense: champion.metadata?.stats?.defense || 80,
+        priceEth: champion.price || (Math.random() * 3 + 0.1),
+        sellerAddress: champion.user_id?.slice(0, 6) + '...' + champion.user_id?.slice(-4) || 'Unknown',
+      }));
+
+      setListings(formattedListings);
+      setFilteredListings(formattedListings);
+    } catch (error) {
+      console.error('Failed to load marketplace listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     let filtered = listings;
@@ -106,6 +108,17 @@ export default function MarketplacePage() {
   };
 
   if (!mounted) return null;
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading marketplace listings...</p>
+        </div>
+      </div>
+    );
+  }
 
   const totalVolume = listings.reduce((sum, listing) => sum + listing.priceEth, 0);
   const floorPrice = listings.length > 0 ? Math.min(...listings.map((l) => l.priceEth)) : 0;
