@@ -16,13 +16,35 @@ const orbitron = Orbitron({
 })
 
 export const metadata: Metadata = {
-  title: 'Arena GameFi | Battle, Collect, Conquer',
-  description: 'The ultimate blockchain gaming experience on Base. Collect champions, battle opponents, stake tokens, and dominate the arena.',
-  keywords: ['GameFi', 'NFT', 'Blockchain', 'Gaming', 'Base', 'Champions', 'PVP', 'Staking'],
+  title: 'ArenaVerse | Play to Earn on Base',
+  description: 'Premium Web3 gaming platform. Collect Champion NFTs, battle in PvE and PvP arenas, trade in the marketplace, and earn ARENA rewards.',
+  keywords: ['GameFi', 'NFT', 'Web3', 'Gaming', 'Base', 'Champions', 'PVP', 'Staking', 'Blockchain'],
   openGraph: {
-    title: 'Arena GameFi | Battle, Collect, Conquer',
-    description: 'The ultimate blockchain gaming experience on Base.',
+    title: 'ArenaVerse | Play to Earn on Base',
+    description: 'Premium Web3 gaming platform on Base blockchain.',
     type: 'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 120,
+        height: 120,
+        alt: 'ArenaVerse Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ArenaVerse | Play to Earn on Base',
+    description: 'Premium Web3 gaming platform on Base blockchain.',
+    images: ['/logo.png'],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'ArenaVerse',
+  },
+  formatDetection: {
+    telephone: false,
   },
 }
 
@@ -30,6 +52,9 @@ export const viewport: Viewport = {
   themeColor: '#0a0a12',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
