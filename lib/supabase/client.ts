@@ -91,3 +91,87 @@ export interface StakingRecord {
   unlocked_at?: string;
   claimed_rewards: number;
 }
+
+export interface SIWESession {
+  id: string;
+  user_id: string;
+  message: string;
+  signature: string;
+  nonce: string;
+  chain_id: number;
+  created_at: string;
+  verified_at?: string;
+  expires_at?: string;
+}
+
+export interface Quest {
+  id: string;
+  name: string;
+  description?: string;
+  quest_type: string;
+  difficulty: string;
+  reward_xp: number;
+  reward_tokens: number;
+  reward_nft?: string;
+  requirements?: any;
+  active: boolean;
+  created_at: string;
+}
+
+export interface QuestProgress {
+  id: string;
+  user_id: string;
+  quest_id: string;
+  progress: number;
+  completed_at?: string;
+  rewards_claimed: boolean;
+  started_at: string;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: string;
+  username: string;
+  total_xp: number;
+  level: number;
+  wins: number;
+  win_rate: number;
+  total_battles: number;
+  arena_tokens_earned: number;
+  updated_at: string;
+}
+
+export interface RewardHistory {
+  id: string;
+  user_id: string;
+  reward_type: string;
+  reward_amount: number;
+  source_id?: string;
+  source_type?: string;
+  transaction_hash?: string;
+  claimed_at: string;
+  created_at: string;
+}
+
+export interface BlockchainEvent {
+  id: string;
+  event_type: string;
+  contract_address: string;
+  transaction_hash?: string;
+  block_number?: number;
+  log_index?: number;
+  data: any;
+  processed: boolean;
+  created_at: string;
+}
+
+export interface AuditLog {
+  id: string;
+  admin_id: string;
+  action: string;
+  target_user_id?: string;
+  details?: any;
+  ip_address?: string;
+  user_agent?: string;
+  created_at: string;
+}

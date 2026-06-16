@@ -38,6 +38,15 @@ const navigation = [
   { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
 ];
 
+const ecosystemNav = [
+  { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Ecosystem', href: '/ecosystem', icon: Zap },
+  { name: 'AI Studio', href: '/ai-studio', icon: Zap },
+  { name: 'Launchpad', href: '/launchpad', icon: Zap },
+  { name: 'Guilds', href: '/guilds', icon: Users },
+  { name: 'Tournaments', href: '/tournaments', icon: Shield },
+];
+
 export function Header() {
   const pathname = usePathname();
   const { 
@@ -94,6 +103,35 @@ export function Header() {
                 </Link>
               );
             })}
+            
+            {/* Ecosystem Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost"
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-2 text-sm font-medium',
+                    ecosystemNav.some(item => pathname.startsWith(item.href.split('/')[1]) && item.href !== '/dashboard')
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  )}
+                >
+                  <Zap className="w-4 h-4" />
+                  Ecosystem
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {ecosystemNav.map((item) => (
+                  <DropdownMenuItem key={item.name} asChild>
+                    <Link href={item.href} className="flex items-center gap-2">
+                      <item.icon className="w-4 h-4" />
+                      {item.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Right Side - Wallet */}
