@@ -1,136 +1,146 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { useAccount, useBalance, useConnect, useDisconnect, useSwitchChain, usePublicClient } from 'wagmi';
+import { metaMask, walletConnect, coinbaseWallet } from '@wagmi/connectors';
+import { base } from 'wagmi/chains';
+import { createConfig, http } from '@wagmi/core';
+import { CONTRACTS, BASE_CHAIN_ID, ADMIN_ADDRESSES, formatAddress } from './contracts';
 import { ethers } from 'ethers';
-import { CONTRACTS, BASE_CHAIN_ID, BASE_RPC, ADMIN_ADDRESSES } from './contracts';
 
-declare global {
-  interface Window {
-    ethereum?: any;
-  }
-}
+export const BASE_CHAIN = base;
+
+// Create Wagmi config
+export const wagmiConfig = createConfig({
+  chains: [base],
+  connectors: [
+    metaMask(),
+    walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'demo-project-id',
+    }),
+    coinbaseWallet({
+      appName: 'ArenaVerse',
+    }),
+  ],
+  transports: {
+    [base.id]: http(),
+  },
+});
 
 interface Web3ContextType {
-  provider: ethers.BrowserProvider | null;
-  signer: ethers.Signer | null;
   address: string | null;
   chainId: number | null;
   isConnected: boolean;
-  balance: string;
+  isConnecting: boolean;
+  ethBalance: string;
+  arenaBalance: string;
   isAdmin: boolean;
-  connectWallet: () => Promise<void>;
-  disconnectWallet: () => void;
+  connect: (connectorName?: string) => Promise<void>;
+  disconnect: () => void;
   switchToBase: () => Promise<void>;
-  getContract: (contractAddress: string, abi: string[]) => ethers.Contract | null;
+  formatAddress: (addr: string) => string;
+  publicClient: any | null;
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
 
 export function Web3Provider({ children }: { children: ReactNode }) {
-  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
-  const [signer, setSigner] = useState<ethers.Signer | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
-  const [chainId, setChainId] = useState<number | null>(null);
-  const [balance, setBalance] = useState<string>('0');
+  const { address, chainId, isConnected } = useAccount();
+  const { data: balanceData } = useBalance({ address, chainId: base.id });
+  const { connect, connectors, isPending: isConnecting } = useConnect();
+  const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
+  const publicClient = usePublicClient({ chainId: base.id });
 
-  const connectWallet = useCallback(async () => {
-    if (typeof window === 'undefined' || !window.ethereum) {
-      alert('Please install MetaMask');
-      return;
-    }
+  const [arenaBalance, setArenaBalance] = useState<string>('0.0000');
 
-    try {
-      const newProvider = new ethers.BrowserProvider(window.ethereum);
-      const newSigner = await newProvider.getSigner();
-      const userAddress = await newSigner.getAddress();
-      const network = await newProvider.getNetwork();
-      const userBalance = await newProvider.getBalance(userAddress);
-
-      setProvider(newProvider);
-      setSigner(newSigner);
-      setAddress(userAddress);
-      setChainId(Number(network.chainId));
-      setBalance(ethers.formatEther(userBalance));
-
-      if (Number(network.chainId) !== BASE_CHAIN_ID) {
-        await switchToBase();
-      }
-    } catch (error) {
-      console.error('Failed to connect wallet:', error);
-      alert('Failed to connect wallet');
-    }
-  }, []);
-
-  const disconnectWallet = useCallback(() => {
-    setProvider(null);
-    setSigner(null);
-    setAddress(null);
-    setChainId(null);
-    setBalance('0');
-  }, []);
-
-  const switchToBase = useCallback(async () => {
-    if (!window.ethereum) return;
-
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${BASE_CHAIN_ID.toString(16)}` }],
-      });
-    } catch (error: any) {
-      if (error.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: `0x${BASE_CHAIN_ID.toString(16)}`,
-              chainName: 'Base',
-              rpcUrls: [BASE_RPC],
-              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-              blockExplorerUrls: ['https://basescan.org'],
-            },
-          ],
-        });
-      }
-    }
-  }, []);
-
-  const getContract = useCallback(
-    (contractAddress: string, abi: string[]) => {
-      if (!signer) return null;
-      return new ethers.Contract(contractAddress, abi, signer);
-    },
-    [signer]
-  );
-
+  // Fetch ARENA token balance
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.ethereum) return;
+    const fetchArenaBalance = async () => {
+      if (!address || !publicClient) {
+        setArenaBalance('0.0000');
+        return;
+      }
 
-    const handleAccountsChanged = (accounts: string[]) => {
-      if (accounts.length === 0) {
-        disconnectWallet();
-      } else {
-        connectWallet();
+      try {
+        const ARENA_TOKEN_ABI = [
+          'function balanceOf(address owner) view returns (uint256)',
+          'function decimals() view returns (uint8)',
+        ] as const;
+
+        const balance = await publicClient.readContract({
+          address: CONTRACTS.ARENA_TOKEN as `0x${string}`,
+          abi: ARENA_TOKEN_ABI,
+          functionName: 'balanceOf',
+          args: [address as `0x${string}`],
+        });
+
+        const decimals = await publicClient.readContract({
+          address: CONTRACTS.ARENA_TOKEN as `0x${string}`,
+          abi: ARENA_TOKEN_ABI,
+          functionName: 'decimals',
+        });
+
+        const formatted = (Number(balance) / Math.pow(10, decimals)).toFixed(4);
+        setArenaBalance(formatted);
+      } catch (error) {
+        console.error('[v0] Failed to fetch ARENA balance:', error);
+        setArenaBalance('0.0000');
       }
     };
 
-    const handleChainChanged = () => {
-      window.location.reload();
-    };
+    fetchArenaBalance();
+    const interval = setInterval(fetchArenaBalance, 10000); // Refresh every 10 seconds
+    return () => clearInterval(interval);
+  }, [address, publicClient]);
 
-    window.ethereum.on('accountsChanged', handleAccountsChanged);
-    window.ethereum.on('chainChanged', handleChainChanged);
+  // Ensure user is on Base chain
+  const switchToBase = useCallback(async () => {
+    if (chainId !== base.id) {
+      try {
+        await switchChain({ chainId: base.id });
+      } catch (error) {
+        console.error('[v0] Failed to switch chain:', error);
+      }
+    }
+  }, [chainId, switchChain]);
 
-    return () => {
-      window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      window.ethereum.removeListener('chainChanged', handleChainChanged);
-    };
-  }, [connectWallet, disconnectWallet]);
+  const handleConnect = useCallback(
+    async (connectorName?: string) => {
+      const connector = connectorName
+        ? connectors.find((c) => c.id === connectorName)
+        : connectors[0];
+
+      if (connector) {
+        connect({ connector });
+      }
+    },
+    [connect, connectors]
+  );
 
   const isAdmin = address ? ADMIN_ADDRESSES.includes(address.toLowerCase()) : false;
 
+  const ethBalanceFormatted = balanceData
+    ? parseFloat(balanceData.formatted).toFixed(4)
+    : '0.0000';
+
   return (
-    <Web3Context.Provider value={{ provider, signer, address, chainId, isConnected: !!address, balance, isAdmin, connectWallet, disconnectWallet, switchToBase, getContract }}>
+    <Web3Context.Provider
+      value={{
+        address: address || null,
+        chainId: chainId || null,
+        isConnected,
+        isConnecting,
+        ethBalance: ethBalanceFormatted,
+        arenaBalance,
+        isAdmin,
+        connect: handleConnect,
+        disconnect,
+        switchToBase,
+        formatAddress,
+        publicClient,
+      }}
+    >
       {children}
     </Web3Context.Provider>
   );

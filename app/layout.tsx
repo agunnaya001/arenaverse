@@ -2,8 +2,12 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Orbitron } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
-import { Web3Provider } from '@/lib/web3-context'
+import { WagmiProvider } from 'wagmi'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Web3Provider, wagmiConfig } from '@/lib/web3-context'
 import './globals.css'
+
+const queryClient = new QueryClient()
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -65,19 +69,23 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${orbitron.variable} font-sans antialiased min-h-screen bg-background`}>
-        <Web3Provider>
-          {children}
-          <Toaster 
-            position="bottom-right"
-            toastOptions={{
-              style: {
-                background: 'oklch(0.17 0.02 260)',
-                border: '1px solid oklch(0.28 0.02 260)',
-                color: 'oklch(0.95 0.01 260)',
-              },
-            }}
-          />
-        </Web3Provider>
+        <WagmiProvider config={wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            <Web3Provider>
+              {children}
+              <Toaster 
+                position="bottom-right"
+                toastOptions={{
+                  style: {
+                    background: 'oklch(0.17 0.02 260)',
+                    border: '1px solid oklch(0.28 0.02 260)',
+                    color: 'oklch(0.95 0.01 260)',
+                  },
+                }}
+              />
+            </Web3Provider>
+          </QueryClientProvider>
+        </WagmiProvider>
         <Analytics />
       </body>
     </html>
