@@ -222,8 +222,8 @@ All pages have been tested and verified working:
 ## Community
 
 - **Discord**: [Join Community](https://discord.gg/arenaverse)
-- **Twitter**: [@ArenaVerse](https://twitter.com/arenaverse)
-- **Website**: [arenaverse.io](https://arenaverse.io)
+- **Twitter**: [@Agunnaya001](https://twitter.com/agunnaya001)
+- **Website**: [arenacoin.agunnayalabs.xyz](https://arenacoin.agunnayalabs.xyz)
 
 ## License
 
