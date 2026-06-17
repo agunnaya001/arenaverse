@@ -1,0 +1,74 @@
+[
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide01Title.tsx",
+    "title": "Arena Battle",
+    "description": "Title slide — 3D Blockchain Battle Game on Base Mainnet",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide02Opportunity.tsx",
+    "title": "The Opportunity",
+    "description": "Market context — Web3 gaming gap and Base Mainnet advantages",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide03HowItWorks.tsx",
+    "title": "How It Works",
+    "description": "Four-step game loop: Mint → Stake → Battle → Earn",
+    "speakerNotes": ""
+  },
+  {
+    "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide04FighterClasses.tsx",
+    "title": "Fighter Classes",
+    "description": "Warrior, Mage, and Rogue — stats and playstyles",
+    "speakerNotes": ""
+  },
+  {
+    "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide05BattleArena.tsx",
+    "title": "3D Battle Arena",
+    "description": "WebGL arena powered by Three.js and React Three Fiber",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide06SmartContracts.tsx",
+    "title": "Smart Contracts",
+    "description": "Five contracts deployed on Base Mainnet",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide07TechStack.tsx",
+    "title": "Tech Stack",
+    "description": "Frontend, wallet, contracts, backend, and chain layers",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
+    "position": 8,
+    "filepath": "src/pages/slides/Slide08Architecture.tsx",
+    "title": "Architecture",
+    "description": "Three-tier system: Browser → API Server → Base Mainnet",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c9d0e1f2-a3b4-5678-cdef-789012345678",
+    "position": 9,
+    "filepath": "src/pages/slides/Slide09Closing.tsx",
+    "title": "Enter the Arena",
+    "description": "Closing slide — live on Base Mainnet, MIT License, Telegram ready",
+    "speakerNotes": ""
+  }
+]

@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/arena-battle-deck/"
+title = "Arena Battle — Slide Deck"
+version = "1.0.0"
+id = "artifacts/arena-battle-deck"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/arena-battle-deck/" ]
+localPort = 25342
+
+[services.development]
+run = "pnpm --filter @workspace/arena-battle-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/arena-battle-deck", "run", "build" ]
+publicDir = "artifacts/arena-battle-deck/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25342"
+BASE_PATH = "/arena-battle-deck/"

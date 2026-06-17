@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: var(--slide-primary);
+  --color-accent: var(--slide-accent);
+  --color-accent2: var(--slide-accent2);
+  --color-bg: var(--slide-bg);
+  --color-surface: var(--slide-surface);
+  --color-text: var(--slide-text);
+  --color-muted: var(--slide-muted);
+  --font-display: var(--font-display-family);
+  --font-body: var(--font-body-family);
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base: 1rem;
+  --text-base--line-height: calc(1.5 / 1);
+  --text-lg: 1.125rem;
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --text-xl: 1.25rem;
+  --text-xl--line-height: calc(1.75 / 1.25);
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: calc(2 / 1.5);
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: calc(2.25 / 1.875);
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: calc(2.5 / 2.25);
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-7xl: 4.5rem;
+  --text-7xl--line-height: 1;
+  --text-8xl: 6rem;
+  --text-8xl--line-height: 1;
+  --text-9xl: 8rem;
+  --text-9xl--line-height: 1;
+}
+
+:root {
+  --slide-bg: #080c14;
+  --slide-surface: #0e1525;
+  --slide-primary: #e8eaf6;
+  --slide-accent: #00c8a0;
+  --slide-accent2: #f0a22a;
+  --slide-text: #e8eaf6;
+  --slide-muted: #5a6485;
+  --font-display-family: "Barlow Condensed", sans-serif;
+  --font-body-family: "DM Sans", sans-serif;
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--slide-bg);
+  color: var(--slide-text);
+}
+
+.slide {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide-viewer {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Dot-grid background texture */
+.dot-grid {
+  background-image: radial-gradient(circle, #1e2a40 1px, transparent 1px);
+  background-size: 3vw 3vw;
+}
+
+/* Accent underline for slide titles */
+.title-underline {
+  position: relative;
+  padding-bottom: 1.2vh;
+}
+.title-underline::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 5vw;
+  height: 0.4vh;
+  background: var(--slide-accent);
+  border-radius: 2px;
+}
+
+/* Per-element staggered animations */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(1.5vh);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-0 { animation: fadeSlideUp 0.45s ease both 0s; }
+.anim-1 { animation: fadeSlideUp 0.45s ease both 0.1s; }
+.anim-2 { animation: fadeSlideUp 0.45s ease both 0.2s; }
+.anim-3 { animation: fadeSlideUp 0.45s ease both 0.3s; }
+.anim-4 { animation: fadeSlideUp 0.45s ease both 0.4s; }
+.anim-5 { animation: fadeSlideUp 0.45s ease both 0.5s; }
+.anim-6 { animation: fadeSlideUp 0.45s ease both 0.6s; }
+
+/* Disable animations on /allslides for export */
+.no-anim .anim-0,
+.no-anim .anim-1,
+.no-anim .anim-2,
+.no-anim .anim-3,
+.no-anim .anim-4,
+.no-anim .anim-5,
+.no-anim .anim-6 {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
