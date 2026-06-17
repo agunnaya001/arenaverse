@@ -1,0 +1,32 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "XJNgcCQpHYUNAPwy5V4uI"
+uri = "file://artifacts/arena-battle/public/images/warrior.png"
+type = "image"
+title = "cyberpunk warrior fighter"
+
+[[generated]]
+id = "0LfGEg2WsMKvs1TLS7qOs"
+uri = "file://artifacts/arena-battle/public/images/mage.png"
+type = "image"
+title = "cyberpunk mage fighter"
+
+[[generated]]
+id = "s0J4e75zLOo196vZpaFDE"
+uri = "file://artifacts/arena-battle/public/images/rogue.png"
+type = "image"
+title = "cyberpunk rogue fighter"
+
+[[generated]]
+id = "_E36UZhgk25FD1pqJhcSl"
+uri = "file://artifacts/arena-battle/public/images/hero-bg.png"
+type = "image"
+title = "cyberpunk arena background"
+
+[[generated]]
+id = "AtbJubGcU4wpp2wG1Q-Hi"
+uri = "file://artifacts/arena-battle/public/images/token.png"
+type = "image"
+title = "arena token coin"

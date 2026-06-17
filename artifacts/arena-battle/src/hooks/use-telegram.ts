@@ -22,14 +22,16 @@ export function useTelegram() {
 
         if (isTMAEnvironment) {
           init();
-          const { initData } = retrieveLaunchParams();
+          const launchParams = retrieveLaunchParams();
+          const initData = (launchParams as any)?.initData;
           if (initData?.user) {
+            const u = initData.user;
             setUser({
-              id: initData.user.id,
-              firstName: initData.user.firstName,
-              lastName: initData.user.lastName,
-              username: initData.user.username,
-              photoUrl: initData.user.photoUrl,
+              id: u.id,
+              firstName: u.first_name ?? u.firstName ?? '',
+              lastName: u.last_name ?? u.lastName,
+              username: u.username,
+              photoUrl: u.photo_url ?? u.photoUrl,
             });
           }
         }

@@ -1,0 +1,3 @@
+- [Arena Battle ABI pattern](arena-abi-pattern.md) — use JSON ABI `as const` arrays, never `parseAbi()` for contracts with structs/tuples
+- [Arena Battle wagmi version](arena-wagmi-version.md) — wagmi must stay at 2.19.x for RainbowKit 2.2.x compatibility
+- [Arena Battle api-client-react](arena-api-client.md) — rebuild dist with `pnpm exec tsc --build` in lib/api-client-react when hooks are added to source

@@ -1,10 +1,11 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { motion } from "framer-motion"
+import { motion, type HTMLMotionProps } from "framer-motion"
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<HTMLMotionProps<"button">, 'children'> {
   variant?: 'primary' | 'secondary' | 'accent' | 'destructive' | 'outline';
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
 export const NeonButton = React.forwardRef<HTMLButtonElement, ButtonProps>(

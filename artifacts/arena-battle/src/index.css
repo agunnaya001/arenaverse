@@ -101,11 +101,15 @@
 
 @layer utilities {
   .text-shadow-neon-cyan {
-    text-shadow: 0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--primary) / 0.5);
+    text-shadow: 0 0 5px hsl(var(--primary)), 0 0 15px hsl(var(--primary) / 0.6), 0 0 30px hsl(var(--primary) / 0.3);
   }
   
   .text-shadow-neon-magenta {
-    text-shadow: 0 0 5px hsl(var(--secondary)), 0 0 10px hsl(var(--secondary) / 0.5);
+    text-shadow: 0 0 5px hsl(var(--secondary)), 0 0 15px hsl(var(--secondary) / 0.6);
+  }
+
+  .text-shadow-neon-yellow {
+    text-shadow: 0 0 5px hsl(var(--accent)), 0 0 15px hsl(var(--accent) / 0.6);
   }
 
   .box-shadow-neon-cyan {
@@ -121,6 +125,22 @@
     background-image: 
       linear-gradient(to right, hsl(var(--primary) / 0.1) 1px, transparent 1px),
       linear-gradient(to bottom, hsl(var(--primary) / 0.1) 1px, transparent 1px);
+  }
+
+  .animate-neon-flicker {
+    animation: neon-flicker 4s infinite;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  .animate-float-up {
+    animation: float-up 1s ease-out forwards;
+  }
+
+  .animate-victory-glow {
+    animation: victory-glow 1.5s ease-in-out infinite;
   }
 }
 
@@ -141,6 +161,40 @@
   60% { transform: translate(2px, 2px) }
   80% { transform: translate(2px, -2px) }
   100% { transform: translate(0) }
+}
+
+@keyframes neon-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.4; }
+  94% { opacity: 1; }
+  96% { opacity: 0.6; }
+  97% { opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(6px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(2px); }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes hp-drain {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+@keyframes victory-glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(var(--accent) / 0.5); }
+  50% { box-shadow: 0 0 60px hsl(var(--accent) / 0.9), 0 0 100px hsl(var(--accent) / 0.4); }
 }
 
 /* Custom Scrollbar */
